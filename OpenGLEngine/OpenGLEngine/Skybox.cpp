@@ -164,7 +164,6 @@ std::vector<const char*> Skybox::GetSkyboxPaths(SkyboxType type)
 {
 	switch (type)
 	{
-
 	case SkyboxType::StylizedCloud1:
 		return {
 			Textures::Skybox::StylizedCloud1::RIGHT,

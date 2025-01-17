@@ -227,8 +227,9 @@ void CreateShaders()
 	omniShadowShader.CreateFromFiles("Shaders/omni_shadow_map.vert", "Shaders/omni_shadow_map.geom", "Shaders/omni_shadow_map.frag");
 }
 
-#pragma endregion Create Elements
+#pragma endregion 
 
+#pragma region Render
 // Apply transformation and materials to an object
 void ApplyTransformAndMaterial(glm::mat4 model, Texture& texture, Material& material) {
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -242,6 +243,17 @@ void RenderObject(glm::vec3 position, Texture& texture, Material& material, Mesh
 	model = glm::translate(model, position);
 	ApplyTransformAndMaterial(model, texture, material);
 	mesh->RenderMesh();
+}
+
+void Render3DModelObject(Model modelInfo,glm::mat4 model, glm::vec3 pos, glm::float32 angle, glm::vec3 axis, glm::vec3 scale)
+{
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, pos);
+	model = glm::rotate(model, angle * toRadians, axis);
+	model = glm::scale(model, scale);
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+	modelInfo.RenderModel();
 }
 
 
@@ -298,17 +310,56 @@ void RenderScene()
 	//shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 	//xwing.RenderModel();
 
-
 	// Mech Model
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
-	model = glm::rotate(model, rotationSpeedMech * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-	mech.RenderModel();
+	Render3DModelObject(mech, model, glm::vec3(0.0f, -2.0f, 0.0f), rotationSpeedMech, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
+#pragma endregion 
+
+#pragma region Initialize 
+
+void CreatePointLights()
+{
+	pointLights[pointLightCount] = PointLight(1024, 1024,
+		0.01f, 100.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f,
+		1.0f, 2.0f, 0.0f,
+		0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+}
+
+
+void InitializeSkybox()
+{
+	
+	// Initialize skybox with textures
+	skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::RIGHT);
+	skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::LEFT);
+	skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::TOP);
+	skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::DOWN);
+	skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::BACK);
+	skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::FRONT);
+
+	skybox = Skybox(skyboxFaces);    // Create the Skybox
+}
+
+void InitializeModels()
+{
+	// Load 3D models (e.g., X-wing, Blackhawk)
+	xwing = Model();
+	xwing.LoadModel(Models::XWING);
+
+	blackhawk_1 = Model();
+	blackhawk_1.LoadModel(Models::BLACKHAWK);
+
+	blackhawk_2 = Model();
+	blackhawk_2.LoadModel(Models::BLACKHAWK);
+
+	mech = Model();
+	mech.LoadModel(Models::MECH);
+}
+#pragma endregion
 
 #pragma region ShadowMapPass
 
@@ -431,33 +482,7 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	RenderScene();
 }
 
-#pragma region Initialize 
 
-	void CreatePointLights()
-	{
-		pointLights[pointLightCount] = PointLight(1024, 1024,
-			0.01f, 100.0f,
-			0.0f, 0.0f, 1.0f,
-			0.0f, 1.0f,
-			1.0f, 2.0f, 0.0f,
-			0.3f, 0.2f, 0.1f);
-		pointLightCount++;
-	}
-
-
-	void InitializeSkybox()
-	{
-		// Initialize skybox with textures
-		skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::RIGHT);
-		skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::LEFT);
-		skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::TOP);
-		skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::DOWN);
-		skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::BACK);
-		skyboxFaces.push_back(Textures::Skybox::StylizedCloudNight::FRONT);
-
-		skybox = Skybox(skyboxFaces);    // Create the Skybox
-	}
-#pragma endregion
 
 #pragma region UpdateControl
 	void SwitchSkybox()
@@ -512,18 +537,8 @@ int main()
 	shinyMaterial = Material(4.0f, 256);
 	dullMaterial  = Material(0.3f, 4);
 
-	// Load 3D models (e.g., X-wing, Blackhawk)
-	xwing = Model();
-	xwing.LoadModel(Models::XWING);
-
-	blackhawk_1 = Model();
-	blackhawk_1.LoadModel(Models::BLACKHAWK);
-
-	blackhawk_2 = Model();
-	blackhawk_2.LoadModel(Models::BLACKHAWK);
-
-	mech = Model();
-	mech.LoadModel(Models::MECH);
+	// Initialize Loading Model
+	InitializeModels();
 
 	// Initialize main directional light
 	mainLight = DirectionalLight(2048, 2048,

@@ -54,7 +54,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);				// Allow forward compatibility for macOS
 
 	// Create the window
-	mainWindow = glfwCreateWindow(width, height, "OpenGLEngine", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "NOOT - OpenGLEngine", NULL, NULL);
 	if (!mainWindow)
 	{
 		printf("Error creating GLFW window!");
