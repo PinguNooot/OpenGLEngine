@@ -1,9 +1,6 @@
 # OpenGLEngine
 ![OpenGLRenderer (1)](https://github.com/user-attachments/assets/8eab7d90-78e7-48d7-9830-2339d21b9ed5)
 
-Render Engine in OpenGL
-
-
 ## How to Use
 ### Librairies
 - ASSIMP
