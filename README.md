@@ -30,9 +30,9 @@
 |                     | D & RightArrow| Move Right         |
 |                     | A             | Move Up            |
 |                     | E             | Move Down          |
-|                     | Shift Left    | Run                |
-|                     | Ctrl Left     | Accelerate         |
-| **Camera**          | Mouse Movement| Deccelerate        |
+|                     | Shift Left    | Accelerate         |
+|                     | Ctrl Left     | Deccelerate        |
+| **Camera**          | Mouse Movement| Move Camera        |
 | **Light Torch**     | L             | Toggle Light on camera On/Off |
 |---------------------| **Modifying Rendering** | -----------------------------------------|
 | **Switch Skybox**   | 1             | Change Skybox to Stylized Cloud |
